@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#07070a">
+<title>New Year's Eve Countdown</title>
+<style>
+:root{--bg:#07070a;--fg:#f5f5f2;--muted:#9b9ba3;--line:rgba(255,255,255,.12);--accent:#d9ff55}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--fg);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{overflow:hidden}main{min-height:100vh;position:relative;display:grid;place-items:center;overflow:hidden}
+.grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:64px 64px;mask-image:radial-gradient(circle at center,#000 10%,transparent 78%);opacity:.5}
+.glow{position:absolute;width:42vw;height:42vw;border-radius:50%;background:radial-gradient(circle,rgba(217,255,85,.13),transparent 68%);filter:blur(10px);animation:float 8s ease-in-out infinite}
+@keyframes float{50%{transform:translate(2vw,-2vh) scale(1.08)}}
+.wrap{position:relative;width:min(1200px,92vw);text-align:center;padding:48px 0}
+.kicker{display:inline-flex;align-items:center;gap:10px;color:var(--muted);font-size:12px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:28px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 20px var(--accent)}
+h1{font-size:clamp(48px,9vw,132px);line-height:.86;letter-spacing:-.075em;margin:0;font-weight:800}
+h1 span{display:block}
+.sub{margin:28px auto 0;max-width:580px;color:var(--muted);font-size:clamp(15px,1.6vw,19px);line-height:1.6}
+.countdown{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:54px auto 0;max-width:1000px}
+.unit{border:1px solid var(--line);background:rgba(255,255,255,.035);backdrop-filter:blur(16px);padding:28px 12px 22px;border-radius:18px;position:relative;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+.unit:after{content:"";position:absolute;inset:auto 0 0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.7}
+.num{font-variant-numeric:tabular-nums;font-size:clamp(42px,7vw,94px);font-weight:750;letter-spacing:-.06em;line-height:1}
+.label{margin-top:12px;color:var(--muted);font-size:11px;letter-spacing:.2em;text-transform:uppercase}
+.footer{margin-top:36px;color:#66666e;font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+@media(max-width:700px){body{overflow:auto}.countdown{grid-template-columns:repeat(2,1fr);gap:10px;margin-top:38px}.unit{padding:24px 8px 18px}.wrap{padding:30px 0}.sub{margin-top:22px}.footer{margin-top:24px}}
+@media(max-width:420px){.countdown{grid-template-columns:repeat(2,1fr);gap:8px}.kicker{letter-spacing:.14em;font-size:10px}.footer{letter-spacing:.08em}} 
+@media(prefers-reduced-motion:reduce){.glow{animation:none}}
+</style>
+</head>
+<body>
+<main>
+<div class="grid"></div><div class="glow"></div>
+<section class="wrap" aria-label="New Year's Eve countdown">
+<div class="kicker"><i class="dot"></i><span id="yearLabel">COUNTING DOWN TO 2027</span></div>
+<h1><span>NEW YEAR'S</span><span>EVE.</span></h1>
+<p class="sub">A fresh year is getting closer. Make the last moments count.</p>
+<div class="countdown" role="timer" aria-live="polite">
+<div class="unit"><div class="num" id="days">000</div><div class="label">Days</div></div>
+<div class="unit"><div class="num" id="hours">00</div><div class="label">Hours</div></div>
+<div class="unit"><div class="num" id="minutes">00</div><div class="label">Minutes</div></div>
+<div class="unit"><div class="num" id="seconds">00</div><div class="label">Seconds</div></div>
+</div>
+<div class="footer" id="status">Until midnight · local time</div>
+</section>
+</main>
+<script>
+(function(){
+  const $=id=>document.getElementById(id);
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'local time';
+
+  function targetDate(){
+    const now=new Date();
+    return new Date(now.getFullYear()+1,0,1,0,0,0,0);
+  }
+
+  let target=targetDate();
+
+  function pad(n,w){return String(n).padStart(w,"0")}
+
+  function tick(){
+    const now=new Date();
+    if(now>=target){ target=targetDate(); }
+
+    const ms=target-now;
+    const total=Math.max(0,Math.ceil(ms/1000));
+    const days=Math.floor(total/86400);
+    const hours=Math.floor((total%86400)/3600);
+    const minutes=Math.floor((total%3600)/60);
+    const seconds=total%60;
+
+    $("days").textContent=pad(days,3);
+    $("hours").textContent=pad(hours,2);
+    $("minutes").textContent=pad(minutes,2);
+    $("seconds").textContent=pad(seconds,2);
+    $("yearLabel").textContent="COUNTING DOWN TO "+target.getFullYear();
+    $("status").textContent="Until midnight · " + timezone;
+  }
+
+  tick();
+  setInterval(tick,1000);
+})();
+</script>
+</body>
+</html>
